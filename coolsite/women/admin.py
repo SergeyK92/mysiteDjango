@@ -12,7 +12,6 @@ class WomenAdmin(admin.ModelAdmin):
     list_filter = ('is_published', 'time_create')
     prepopulated_fields = {'slug': ('title',)}
 
-
 # Класс для отображения информации в админ панели
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'slug')
