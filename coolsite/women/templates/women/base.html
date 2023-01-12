@@ -50,15 +50,15 @@
                             <li class="{% url 'home' %}">Все категории</li>
                             {% endif %}
 
-{% show_categories 'name' cat_selected %}
-<!--                            {% for c in cats %}-->
-<!--                            {% if c.pk == cat_selected %}-->
-<!--                            <li class="selected">{{c.name}}</li>-->
-<!--                            {% else %}-->
-<!--                            <li><a href="{{ c.get_absolute_url }}"> {{c.name}}</a></li>-->
+                            <!--{% show_categories 'name' cat_selected %}-->
+                            {% for c in cats %}
+                            {% if c.pk == cat_selected %}
+                            <li class="selected">{{c.name}}</li>
+                            {% else %}
+                            <li><a href="{{ c.get_absolute_url }}"> {{c.name}}</a></li>
 
-<!--                            {% endif %}-->
-<!--                            {% endfor %}-->
+                            {% endif %}
+                            {% endfor %}
 
 
                             <li class="share">

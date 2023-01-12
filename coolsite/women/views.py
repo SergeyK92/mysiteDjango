@@ -5,29 +5,22 @@ from django.views.generic import ListView, DetailView, CreateView
 
 from .forms import AddPostForm
 from .models import Women, Category
-
-menu = [{'title': 'О сайте', 'url_name': 'about'},
-        {'title': 'Добавить статью', 'url_name': 'add_page'},
-        {'title': 'Обратная связь', 'url_name': 'contact'},
-        {'title': 'Войти', 'url_name': 'login'},
-        ]
+from .utils import DataMixin, menu
 
 
 # menu = ['О сайте', 'Добавить статью', 'Обратная связь', 'Войти']
 
-class WomenHome(ListView):
+class WomenHome(DataMixin, ListView):
     model = Women
     template_name = 'women/index.html'
     # posts это имя списка (листа) содержащего строчки модели Women
     context_object_name = 'posts'
-    cats = Category.objects.all()
-
     # Функция для определения контекста
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['menu'] = menu
-        context['title'] = 'Главная страница сайта'
-        context['cat_selected'] = 0,
+        #с_def это словарь контектса
+        c_def = self.get_user_context(title='Главная страница сайта')
+        context.update(c_def)
         return context
 
     # Указываем что именно выбирать из модели Women
@@ -35,41 +28,22 @@ class WomenHome(ListView):
         return Women.objects.filter(is_published=True).order_by('-time_update')
 
 
-# def index(request):
-#     posts = Women.objects.all()
-#
-#     context = {
-#         'posts': posts[::-1],
-#         'menu': menu,
-#         'title': 'Главная страница сайта',
-#         'cat_selected': 0,
-#     }
-#     return render(request, 'women/index.html', context=context)
-
-
 def about(request):
     return render(request, 'women/about.html', {'title': 'ABOUTстраница сайта', 'menu': menu})
 
 
-class AddPage(CreateView):
+class AddPage(DataMixin, CreateView):
     form_class = AddPostForm
     template_name = 'women/addpage.html'
     # Указываем путь по которому перенаправляем страницу после загрузки формы
     # Можно не указывать, тогда сработает метод     def get_absolute_url(self): модель women
     success_url = reverse_lazy('home')
 
-
-    ## В template для вывода полей формы используется имя form
-    # его можно переопределить в get_context_data например context['form_1'] = self.form_class
-
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['menu'] = menu
-        context['title'] = 'Добавление статьи'
+        c_def = self.get_user_context(title='Добавление статьи')
+        context.update(c_def)
         # context['form_1'] = self.form_class
-
-        # print(context)
-
         return context
 
 
@@ -100,21 +74,17 @@ def login(request):
 
 
 # Класс для отображения отдельного поста
-class ShowPost(DetailView):
+class ShowPost(DataMixin, DetailView):
     model = Women
     template_name = 'women/post.html'
     slug_url_kwarg = 'post_slug'
     context_object_name = 'post'
 
-    # Здесь post  - это имя строчки (объект) базы данных. Когда мы ее пытаемся вывести, срабатывает
-    # магический метод str который мы в классе Women переопределили. от выводит поле title модели women
-
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['menu'] = menu
-        context['title'] = context['post']
-        # print(context)
-
+        #context['post'] - хранится объект базы данных, и когда вы его вызывает на печать работает магический метод str
+        c_def = self.get_user_context(title=context['post'])
+        context.update(c_def)
         return context
 
 
@@ -129,7 +99,7 @@ class ShowPost(DetailView):
 #     return render(request, 'women/post.html', context=context)
 
 
-class WomenCategory(ListView):
+class WomenCategory(DataMixin, ListView):
     model = Women
     template_name = 'women/index.html'
     # posts это имя списка (листа) содержащего строчки модели Women
@@ -141,9 +111,9 @@ class WomenCategory(ListView):
     # Функция для определения контекста
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['menu'] = menu
-        context['title'] = 'Категория - ' + str(context['posts'][0].cat)
-        context['cat_selected'] = context['posts'][0].cat_id
+        c_def = self.get_user_context(title='Категория - ' + str(context['posts'][0].cat),
+                                      cat_selected=context['posts'][0].cat_id)
+        context.update(c_def)
         return context
 
     # Указываем что именно выбирать из модели Women
