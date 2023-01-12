@@ -1,3 +1,4 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse, HttpResponseNotFound, Http404
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
@@ -15,10 +16,11 @@ class WomenHome(DataMixin, ListView):
     template_name = 'women/index.html'
     # posts это имя списка (листа) содержащего строчки модели Women
     context_object_name = 'posts'
+
     # Функция для определения контекста
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        #с_def это словарь контектса
+        # с_def это словарь контектса
         c_def = self.get_user_context(title='Главная страница сайта')
         context.update(c_def)
         return context
@@ -29,15 +31,19 @@ class WomenHome(DataMixin, ListView):
 
 
 def about(request):
-    return render(request, 'women/about.html', {'title': 'ABOUTстраница сайта', 'menu': menu})
+    cats = Category.objects.all()
+    return render(request, 'women/about.html', {'title': 'ABOUTстраница сайта', 'menu': menu, 'cats': cats})
 
 
-class AddPage(DataMixin, CreateView):
+# Добавление записи на сайт
+class AddPage(LoginRequiredMixin, DataMixin, CreateView):
     form_class = AddPostForm
     template_name = 'women/addpage.html'
     # Указываем путь по которому перенаправляем страницу после загрузки формы
     # Можно не указывать, тогда сработает метод     def get_absolute_url(self): модель women
     success_url = reverse_lazy('home')
+    #Указывает адрес перенаправления для незарегистрированных пользователей
+    login_url = '/admin/'
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -80,9 +86,11 @@ class ShowPost(DataMixin, DetailView):
     slug_url_kwarg = 'post_slug'
     context_object_name = 'post'
 
+    # pk_url_kwarg = 'post_id'
+
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        #context['post'] - хранится объект базы данных, и когда вы его вызывает на печать работает магический метод str
+        # context['post'] - хранится объект базы данных, и когда вы его вызывает на печать работает магический метод str
         c_def = self.get_user_context(title=context['post'])
         context.update(c_def)
         return context

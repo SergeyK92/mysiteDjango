@@ -9,6 +9,7 @@ menu = [{'title': 'О сайте', 'url_name': 'about'},
 
 class DataMixin:
     menu = menu
+
     def get_user_context(self, **kwargs):
         context = kwargs
         cats = Category.objects.all()
