@@ -40,7 +40,7 @@ class AddPage(LoginRequiredMixin, DataMixin, CreateView):
     form_class = AddPostForm
     template_name = 'women/addpage.html'
     # Указываем путь по которому перенаправляем страницу после загрузки формы
-    # Можно не указывать, тогда сработает метод     def get_absolute_url(self): модель women
+    # Можно не указывать, тогда сработает метод  def get_absolute_url(self): модель women
     success_url = reverse_lazy('home')
     #Указывает адрес перенаправления для незарегистрированных пользователей
     login_url = reverse_lazy('home')
@@ -91,7 +91,8 @@ class ShowPost(DataMixin, DetailView):
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         # context['post'] - хранится объект базы данных, и когда вы его вызывает на печать работает магический метод str
-        c_def = self.get_user_context(title=context['post'])
+        c_def = self.get_user_context(title=context['post'],
+                                      cat_selected=None)
         context.update(c_def)
         return context
 
@@ -112,9 +113,10 @@ class WomenCategory(DataMixin, ListView):
     template_name = 'women/index.html'
     # posts это имя списка (листа) содержащего строчки модели Women
     context_object_name = 'posts'
-    # Генерация исключения в случае ошибки, например пытаемся обратится по слагу которого нет, \
+    # Генерация исклюexit()чения в случае ошибки, например пытаемся обратится по слагу которого нет, \
     # или нет записей в БД
     allow_empty = False
+
 
     # Функция для определения контекста
     def get_context_data(self, *, object_list=None, **kwargs):

@@ -1,3 +1,5 @@
+from django.db.models import Count
+
 from women.models import Category
 
 menu = [{'title': 'О сайте', 'url_name': 'about'},
@@ -8,12 +10,15 @@ menu = [{'title': 'О сайте', 'url_name': 'about'},
 
 
 class DataMixin:
+    paginate_by = 3
 
 
     def get_user_context(self, **kwargs):
         menu_user = menu.copy()
         context = kwargs
-        cats = Category.objects.all()
+        # cats = Category.objects.all()
+        cats = Category.objects.annotate(Count('women'))
+        # print(cats)
 
         if not self.request.user.is_authenticated:
             menu_user.pop(1)

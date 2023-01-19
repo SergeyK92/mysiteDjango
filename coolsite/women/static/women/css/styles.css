@@ -4,7 +4,7 @@ html, body {
 	padding: 0;
 	height: 100%;
 	width: 100%;
-	color: #e08080;
+	color: #444;
 }
 
 a {
@@ -76,7 +76,7 @@ ul.list-articles li {
 .clear {clear: both;}
 
 .header {
-	background: #373c41;
+	background: #3F4137;
 	height: 60px;
 }
 
@@ -91,7 +91,7 @@ ul.mainmenu {
 	margin: 0;
 	padding: 0;
 	height: 60px;
-	color: #e09a42;
+	color: #fdc073;
 	font-size: 20px;
 	overflow: hidden;
 }
@@ -389,4 +389,43 @@ ul.lang-list li a:hover {color: #fdc073;}
 .form-button {
     min-width: 200px;
     font-size: 16px;
+}
+
+.list-pages {
+	text-align: center;
+	margin: 0 0 15px 0;
+}
+.list-pages ul {
+	margin: 20px 0 0 0;
+	padding: 0;
+	list-style: none;
+
+}
+.list-pages ul li {
+	display: inline-block;
+	margin: 0 20px 0 0;
+}
+.list-pages a {
+	color: #000;
+	font-size: 20px;
+	text-decoration: none;
+}
+.list-pages .page-num, .page-num-selected {
+	display: inline-block;
+	width: 50px;
+	height: 40px;
+	padding: 20px 0 0 0;
+	border: 1px solid #0c26d0;
+	border-radius: 15px;
+}
+.list-pages .page-num:hover {
+	box-shadow: 3px 3px 1px #ffffff;
+}
+.list-pages .page-num-selected {
+	border: none;
+	color: #ec3333;
+	font-size: 25px;
+}
+.list-pages .page-num-selected:hover {
+	box-shadow: none;
 }
