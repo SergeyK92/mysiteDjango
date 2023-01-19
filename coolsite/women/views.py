@@ -43,7 +43,7 @@ class AddPage(LoginRequiredMixin, DataMixin, CreateView):
     # Можно не указывать, тогда сработает метод     def get_absolute_url(self): модель women
     success_url = reverse_lazy('home')
     #Указывает адрес перенаправления для незарегистрированных пользователей
-    login_url = '/admin/'
+    login_url = reverse_lazy('home')
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
