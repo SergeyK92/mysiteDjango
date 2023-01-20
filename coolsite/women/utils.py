@@ -21,6 +21,7 @@ class DataMixin:
             menu_user.pop(1)
         context['menu'] = menu_user
         context['cats'] = cats
+
         if 'cat_selected' not in context:
             context['cat_selected'] = 0
         return context

@@ -1,10 +1,12 @@
+from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.views import LoginView
 from django.http import HttpResponse, HttpResponseNotFound, Http404
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView
 
-from .forms import AddPostForm, RegisterUserForm
+from .forms import AddPostForm, RegisterUserForm, LoginUserForm
 from .models import Women, Category
 from .utils import DataMixin, menu
 
@@ -114,6 +116,7 @@ def pageNotFound(request, exception):
     return HttpResponseNotFound(f'<h1>страница не найдена 404 </h1>')
 
 
+# Класс для регистрации пользователей
 class RegisterUser(DataMixin, CreateView):
     form_class = RegisterUserForm
     template_name = 'women/register.html'
@@ -124,3 +127,21 @@ class RegisterUser(DataMixin, CreateView):
         c_def = self.get_user_context(title='Регистрация')
         context.update(c_def)
         return context
+
+
+# Класс для авторизации пользователей
+
+
+class LoginUser(DataMixin, LoginView):
+    form_class = LoginUserForm
+    template_name = 'women/login.html'
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        c_def = self.get_user_context(title='Авторизация')
+        context.update(c_def)
+        return context
+
+    # Метод вызывается при успешной авторизации пользователя
+    def get_success_url(self):
+        return reverse_lazy('home')
