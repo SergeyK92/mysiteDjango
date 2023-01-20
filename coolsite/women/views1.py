@@ -4,10 +4,12 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView
 
-from .forms import AddPostForm, RegisterUserForm
+from .forms import AddPostForm
 from .models import Women, Category
 from .utils import DataMixin, menu
 
+
+# menu = ['О сайте', 'Добавить статью', 'Обратная связь', 'Войти']
 
 class WomenHome(DataMixin, ListView):
     model = Women
@@ -15,7 +17,7 @@ class WomenHome(DataMixin, ListView):
     # posts это имя списка (листа) содержащего строчки модели Women
     context_object_name = 'posts'
 
-    # Функция для переопределения контекста
+    # Функция для определения контекста
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         # с_def это словарь контектса
@@ -40,16 +42,36 @@ class AddPage(LoginRequiredMixin, DataMixin, CreateView):
     # Указываем путь по которому перенаправляем страницу после загрузки формы
     # Можно не указывать, тогда сработает метод  def get_absolute_url(self): модель women
     success_url = reverse_lazy('home')
-    # Указывает адрес перенаправления для незарегистрированных пользователей
+    #Указывает адрес перенаправления для незарегистрированных пользователей
     login_url = reverse_lazy('home')
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        c_def = self.get_user_context(title='Добавление статьи',
-                                      cat_selected=None)
+        c_def = self.get_user_context(title='Добавление статьи')
         context.update(c_def)
         # context['form_1'] = self.form_class
         return context
+
+
+# def addpage(request):
+#     if request.method == 'POST':
+#         form = AddPostForm(request.POST, request.FILES)
+#         # print(form.cleaned_data)
+#         if form.is_valid():
+#             form.save()  # Используется при связи формы с моделями в БД.
+#             return redirect('home')
+#             # try:
+#             #     # Women.objects.create(**form.cleaned_data)
+#             #     return redirect('home')
+#             # except:
+#             #     form.add_error(None, 'Ошибка добавления поста')
+#     else:
+#         form = AddPostForm()
+#
+#     return render(request, 'women/addpage.html', {'form': form, 'title': 'Добавление статьи', 'menu': menu})
+
+
+
 
 
 def contact(request):
@@ -59,10 +81,8 @@ def contact(request):
 def login(request):
     return HttpResponse(' вход пользователей')
 
-
 def register(request):
     return HttpResponse('Регистрация пользователей')
-
 
 # Класс для отображения отдельного поста
 class ShowPost(DataMixin, DetailView):
@@ -82,6 +102,17 @@ class ShowPost(DataMixin, DetailView):
         return context
 
 
+# def show_post(request, post_slug):
+#     post = get_object_or_404(Women, slug=post_slug)
+#     context = {
+#         'post': post,
+#         'menu': menu,
+#         'title': post.title,
+#         'cat_selected': post.cat_id,
+#     }
+#     return render(request, 'women/post.html', context=context)
+
+
 class WomenCategory(DataMixin, ListView):
     model = Women
     template_name = 'women/index.html'
@@ -90,6 +121,7 @@ class WomenCategory(DataMixin, ListView):
     # Генерация исклюexit()чения в случае ошибки, например пытаемся обратится по слагу которого нет, \
     # или нет записей в БД
     allow_empty = False
+
 
     # Функция для определения контекста
     def get_context_data(self, *, object_list=None, **kwargs):
@@ -104,6 +136,22 @@ class WomenCategory(DataMixin, ListView):
         return Women.objects.filter(cat__slug=self.kwargs['cat_slug'], is_published=True).order_by('-time_update')
 
 
+# def show_category(request, cat_slug):
+#     cat = get_object_or_404(Category, slug=cat_slug)
+#     # print(type(cat), cat.id)
+#     posts = Women.objects.filter(cat=cat.pk)
+#     if len(posts) == 0:
+#         raise Http404()
+#
+#     context = {
+#         'posts': posts,
+#         'menu': menu,
+#         'title': 'Отображение по рубрикам',
+#         'cat_selected': cat.id,
+#     }
+#     return render(request, 'women/index.html', context=context)
+
+
 def categories(request, cat_id):
     if request.GET:
         print(request.GET)
@@ -115,12 +163,4 @@ def pageNotFound(request, exception):
 
 
 class RegisterUser(DataMixin, CreateView):
-    form_class = RegisterUserForm
-    template_name = 'women/register.html'
-    success_url = reverse_lazy('login')
-
-    def get_context_data(self, *, object_list=None, **kwargs):
-        context = super().get_context_data(**kwargs)
-        c_def = self.get_user_context(title='Регистрация')
-        context.update(c_def)
-        return context
+    pass
