@@ -8,6 +8,7 @@ urlpatterns = [
     path('addpage/', AddPage.as_view(), name='add_page'),  # http://127.0.0.1:8000/about/
     path('contact/', contact, name='contact'),  # http://127.0.0.1:8000/about/
     path('login/', LoginUser.as_view(), name='login'),
+    path('logout/', logout_user, name='logout'),
     path('register/', RegisterUser.as_view(), name='register'),
     path('post/<slug:post_slug>/', ShowPost.as_view(), name='post'),  # http://127.0.0.1:8000/about/
     path('category/<slug:cat_slug>/', WomenCategory.as_view(), name='category'),  # http://127.0.0.1:8000/about/

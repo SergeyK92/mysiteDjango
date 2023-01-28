@@ -1,3 +1,4 @@
+from django.contrib.auth import logout, login
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView
@@ -27,7 +28,7 @@ class WomenHome(DataMixin, ListView):
 
     # Указываем что именно выбирать из модели Women
     def get_queryset(self):
-        return Women.objects.filter(is_published=True).order_by('-time_update')
+        return Women.objects.filter(is_published=True).order_by('time_update').select_related('cat')
 
 
 def about(request):
@@ -58,10 +59,6 @@ def contact(request):
     return HttpResponse('Обратная связь')
 
 
-def login(request):
-    return HttpResponse(' вход пользователей')
-
-
 def register(request):
     return HttpResponse('Регистрация пользователей')
 
@@ -89,21 +86,23 @@ class WomenCategory(DataMixin, ListView):
     template_name = 'women/index.html'
     # posts это имя списка (листа) содержащего строчки модели Women
     context_object_name = 'posts'
-    # Генерация исклюexit()чения в случае ошибки, например пытаемся обратится по слагу которого нет, \
+    # Генерация исключения в случае ошибки, например пытаемся обратится по слагу которого нет, \
     # или нет записей в БД
     allow_empty = False
 
-    # Функция для определения контекста
-    def get_context_data(self, *, object_list=None, **kwargs):
-        context = super().get_context_data(**kwargs)
-        c_def = self.get_user_context(title='Категория - ' + str(context['posts'][0].cat),
-                                      cat_selected=context['posts'][0].cat_id)
-        context.update(c_def)
-        return context
-
     # Указываем что именно выбирать из модели Women
     def get_queryset(self):
-        return Women.objects.filter(cat__slug=self.kwargs['cat_slug'], is_published=True).order_by('-time_update')
+        return Women.objects.filter(cat__slug=self.kwargs['cat_slug'], is_published=True).order_by(
+            '-time_update').select_related('cat')
+
+    # Функция для определения контекста
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        c = Category.objects.get(slug=self.kwargs['cat_slug'])
+        c_def = self.get_user_context(title='Категория - ' + str(c.name), cat_selected=c.pk)
+        context.update(c_def)
+        return context
 
 
 def categories(request, cat_id):
@@ -128,10 +127,15 @@ class RegisterUser(DataMixin, CreateView):
         context.update(c_def)
         return context
 
+    # Метод для автоматического входа в систему
+    # при успешной регистрации пользователя
+    def form_valid(self, form):
+        user = form.save()
+        login(self.request, user)
+        return redirect('home')
+
 
 # Класс для авторизации пользователей
-
-
 class LoginUser(DataMixin, LoginView):
     form_class = LoginUserForm
     template_name = 'women/login.html'
@@ -145,3 +149,8 @@ class LoginUser(DataMixin, LoginView):
     # Метод вызывается при успешной авторизации пользователя
     def get_success_url(self):
         return reverse_lazy('home')
+
+
+def logout_user(request):
+    logout(request)
+    return redirect('login')

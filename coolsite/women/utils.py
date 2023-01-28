@@ -9,13 +9,13 @@ menu = [{'title': 'О сайте', 'url_name': 'about'},
 
 
 class DataMixin:
-    paginate_by = 3
+    paginate_by = 2
 
     def get_user_context(self, **kwargs):
         menu_user = menu.copy()
         context = kwargs
         # cats = Category.objects.all()
-        cats = Category.objects.annotate(total=Count('women')).filter(total__gt=0)
+        cats = Category.objects.annotate(total=Count('women')).filter(total__gt=0, women__is_published=True)
 
         if not self.request.user.is_authenticated:
             menu_user.pop(1)
